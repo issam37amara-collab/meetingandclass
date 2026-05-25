@@ -10,4 +10,8 @@ public class ViewController {
     public String home() {
         return "login";
     }
+    @GetMapping("/login")
+public String loginPage() {
+    return "login";
+}
 }
