@@ -89,7 +89,7 @@ public class SecurityConfig {
                 // "Rooms.html" / "rooms.html" are accepted because the existing
                 // navbars in the templates use both spellings.
                 .requestMatchers(
-                    "/", "/index.html", "/login.html", "/signup.html",
+                    "/", "/login", "/signup", "/index.html", "/login.html", "/signup.html",
                     "/pending-approval.html", "/unauthorized.html",
                     "/menu.html", "/super-admin-dashboard.html",
                     "/dos-dashboard.html", "/director-dashboard.html",
