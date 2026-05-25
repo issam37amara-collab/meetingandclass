@@ -27,7 +27,7 @@ document.getElementById('meetingForm').addEventListener('submit', function (e) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending invitations…';
 
-    fetch('http://localhost:8080/api/meetings/create', {
+    fetch('/api/meetings/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

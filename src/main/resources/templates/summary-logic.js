@@ -7,7 +7,7 @@ function fetchMeetings() {
     // Show simple loading message
     listContainer.innerHTML = '<p style="text-align:center;">Fetching meetings from database...</p>';
 
-    fetch('http://localhost:8080/api/meetings/all', {
+    fetch('/api/meetings/all', {
         headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt') }
     })
         .then(response => {
