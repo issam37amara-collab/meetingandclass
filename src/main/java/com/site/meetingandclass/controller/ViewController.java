@@ -8,10 +8,6 @@ public class ViewController {
 
     @GetMapping("/")
     public String home() {
-        return "login";
+        return "redirect:/login.html";
     }
-    @GetMapping("/login")
-public String loginPage() {
-    return "login";
-}
 }
