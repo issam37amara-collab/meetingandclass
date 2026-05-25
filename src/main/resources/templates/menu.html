@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - University Project</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- AOS animations for the wow factor -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        /* General Modern Setup Matches style.css Theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Abstract glowing blobs for premium aesthetic */
+        .blob-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(127, 66, 167, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .blob-2 {
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(102, 0, 197, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 40px);
+            }
+        }
+
+        /* Modern Glassmorphism Navigation */
+        .glass-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .glass-nav .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #a7a7a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .glass-nav ul {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .glass-nav a {
+            text-decoration: none;
+            color: #d1d1d1;
+            font-weight: 400;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .glass-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, #7f42a7, #6600c5);
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav a:hover {
+            color: #ffffff;
+        }
+
+        .glass-nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 200;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #d1d1d1;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dropdown-content a::after {
+            display: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #ffffff;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .welcome-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #a7a7a7;
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-badge span {
+            width: 8px;
+            height: 8px;
+            background-color: #6600c5;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #6600c5;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 0, 197, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(102, 0, 197, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 0, 197, 0);
+            }
+        }
+
+        .welcome-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Accent text color */
+        .welcome-title span {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            max-width: 600px;
+            margin: 2rem auto;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: white;
+            box-shadow: 0 10px 20px rgba(90, 24, 154, 0.3);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(90, 24, 154, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            color: #fff;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 900px) {
+            .glass-nav {
+                padding: 1rem 2rem;
+            }
+
+            .glass-nav ul {
+                display: none;
+                /* Hide standard links on smaller screens */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Gradient Decor -->
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-nav" data-aos="fade-down" data-aos-duration="1000">
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+        <ul>
+            <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
+            <li><a href="menu.html">University</a></li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Meetings</a>
+                <div class="dropdown-content">
+                    <a href="index.html">New Meeting</a>
+                    <a href="summary.html">All Meetings</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Rooms</a>
+                <div class="dropdown-content">
+                    <a href="rooms.html">View Rooms</a>
+                    <a href="admin-reservations.html">Reservations</a>
+                </div>
+            </li>
+
+            <li><a href="class-timetable.html" style="color:#9d4edd">Class Schedules</a></li>
+        </ul>
+        <div class="nav-right">
+
+            <button class="btn-signin" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Welcome Display -->
+    <main class="welcome-section">
+        <div class="welcome-badge" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="200">
+            <span></span> University Hub Platform
+        </div>
+
+        <h1 class="welcome-title" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="400">
+            Welcome to the <br><span>Future of Learning</span>
+        </h1>
+
+        <p class="welcome-subtitle" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="600">
+            Discover a sophisticated, open digital environment. Join meetings, manage your rooms efficiently, and
+            collaborate seamlessly with an enhanced experience built for you.
+        </p>
+
+        <div class="action-buttons" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="800">
+            <a href="rooms.html" class="btn btn-primary">View Rooms</a>
+            <a href="index.html" class="btn btn-secondary">Join A Meeting</a>
+        </div>
+    </main>
+
+    <!-- AOS Script initialization -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        AOS.init({
+            once: true,
+            offset: 50,
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management - University Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .blob-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(127, 66, 167, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .blob-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(102, 0, 197, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 40px);
+            }
+        }
+
+        /* ── NAV ── */
+        .glass-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .glass-nav .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #a7a7a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .glass-nav ul {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .glass-nav a {
+            text-decoration: none;
+            color: #d1d1d1;
+            font-weight: 400;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .glass-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, #7f42a7, #6600c5);
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav a:hover {
+            color: #fff;
+        }
+
+        .glass-nav a:hover::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 200;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #d1d1d1;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            text-align: center;
+            text-transform: none;
+            letter-spacing: normal;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .dropdown-content a::after {
+            display: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #fff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-signin {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signin:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ── VIEW TOGGLE ── */
+        .view-toggle {
+            display: flex;
+            gap: 0.3rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 0.3rem;
+        }
+
+        .view-btn {
+            padding: 0.4rem 1.1rem;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #888;
+            background: transparent;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(90, 24, 154, 0.3);
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 2rem 1.5rem;
+            z-index: 10;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.6rem;
+        }
+
+        .page-header h1 span {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: #a0a0a0;
+            font-size: 1.05rem;
+            font-weight: 300;
+        }
+
+        /* Admin notice bar */
+        .admin-bar {
+            display: none;
+            margin: 0.5rem 5rem;
+            padding: 0.7rem 1.4rem;
+            background: rgba(157, 78, 221, 0.08);
+            border: 1px solid rgba(157, 78, 221, 0.22);
+            border-radius: 10px;
+            color: #b07eee;
+            font-size: 0.85rem;
+            font-weight: 600;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-bar.show {
+            display: flex;
+        }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5rem 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #d1d1d1;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(90, 24, 154, 0.3);
+        }
+
+        .btn-add-room {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.8rem;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: white;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(90, 24, 154, 0.3);
+        }
+
+        .btn-add-room:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        /* ── ROOMS GRID ── */
+        .rooms-section {
+            padding: 0 5rem 4rem;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .room-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 1.8rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .room-card:hover {
+            border-color: rgba(157, 78, 221, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .room-card:hover::before {
+            opacity: 1;
+        }
+
+        .room-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .room-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .room-number {
+            font-size: 0.82rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
+
+        .status-badge {
+            padding: 0.28rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-AVAILABLE {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-RESERVED {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-PENDING {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .room-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .room-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #a0a0a0;
+            font-size: 0.88rem;
+        }
+
+        .room-info-item svg {
+            width: 15px;
+            height: 15px;
+            fill: #7f42a7;
+            flex-shrink: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 0.72rem;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-reserve-active {
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: white;
+            box-shadow: 0 6px 16px rgba(90, 24, 154, 0.3);
+        }
+
+        .btn-reserve-active:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-reserve-disabled {
+            background: rgba(255, 255, 255, 0.04);
+            color: #444;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+        }
+
+        .btn-edit {
+            background: rgba(234, 179, 8, 0.12);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.25);
+        }
+
+        .btn-edit:hover {
+            background: rgba(234, 179, 8, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ── MODALS ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #0e0e0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+
+        .modal-title span {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 0.88rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row>div {
+            flex: 1;
+        }
+
+        .modal label {
+            display: block;
+            color: #c0c0c0;
+            margin-bottom: 0.45rem;
+            font-size: 0.88rem;
+            font-weight: 400;
+        }
+
+        .modal input,
+        .modal textarea,
+        .modal select {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .modal input:focus,
+        .modal textarea:focus,
+        .modal select:focus {
+            border-color: #9d4edd;
+            box-shadow: 0 0 12px rgba(157, 78, 221, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal select option {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.4rem;
+        }
+
+        .btn-modal-primary {
+            flex: 1;
+            padding: 0.85rem;
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-modal-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-modal-secondary {
+            flex: 1;
+            padding: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #d1d1d1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-modal-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .delete-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.6rem;
+        }
+
+        .btn-delete-confirm {
+            flex: 1;
+            padding: 0.85rem;
+            background: rgba(239, 68, 68, 0.18);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete-confirm:hover {
+            background: rgba(239, 68, 68, 0.32);
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+            backdrop-filter: blur(10px);
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #22c55e;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: #555;
+            font-size: 1rem;
+            gap: 0.8rem;
+            grid-column: 1/-1;
+        }
+
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(157, 78, 221, 0.3);
+            border-top-color: #9d4edd;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .glass-nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .glass-nav ul {
+                display: none;
+            }
+
+            .toolbar,
+            .rooms-section,
+            .admin-bar {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2.4rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <!-- NAV -->
+    <nav class="glass-nav" data-aos="fade-down" data-aos-duration="1000">
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+        <ul>
+            <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
+            <li><a href="menu.html">University</a></li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Meetings</a>
+                <div class="dropdown-content">
+                    <a href="index.html">New Meeting</a>
+                    <a href="summary.html">All Meetings</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Rooms</a>
+                <div class="dropdown-content">
+                    <a href="rooms.html">View Rooms</a>
+                    <a href="admin-reservations.html">Reservations</a>
+                </div>
+            </li>
+
+            <li id="navClassSchedules"><a href="class-timetable.html" style="color:#9d4edd">Class Schedules</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="btn-signin" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="admin-bar" id="adminBar">⚙ Admin Mode — You can add, edit, and delete rooms</div>
+
+    <header class="page-header" data-aos="fade-up" data-aos-duration="1000">
+        <h1>Room <span>Management</span></h1>
+        <p>Browse available classrooms and submit reservation requests</p>
+    </header>
+
+    <div class="toolbar" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterRooms('all', this)">All Rooms</button>
+            <button class="filter-btn" onclick="filterRooms('AVAILABLE', this)">Available</button>
+            <button class="filter-btn" onclick="filterRooms('RESERVED',  this)">Reserved</button>
+            <button class="filter-btn" onclick="filterRooms('PENDING',   this)">Pending</button>
+            <span style="color:#333; margin: 0 0.3rem;">|</span>
+            <button class="filter-btn" onclick="filterBySection('Section A', this)">Section A</button>
+            <button class="filter-btn" onclick="filterBySection('Section B', this)">Section B</button>
+            <button class="filter-btn" onclick="filterBySection('Section C', this)">Section C</button>
+        </div>
+        <button class="btn-add-room" id="btnAddRoom" onclick="openAddModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            Add New Room
+        </button>
+    </div>
+
+    <section class="rooms-section">
+        <div class="rooms-grid" id="roomsGrid">
+            <div class="loading-spinner">
+                <div class="spinner"></div> Loading rooms…
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ MODAL: RESERVE ══ -->
+    <div class="modal-overlay" id="reserveModal">
+        <div class="modal">
+            <h2 class="modal-title">Reserve <span>Room</span></h2>
+            <p class="modal-subtitle" id="reserveRoomLabel">–</p>
+            <input type="hidden" id="reserveRoomId">
+
+            <label>Your Name</label>
+            <input type="text" id="rTeacherName" placeholder="Full name" autocomplete="off">
+
+            <label>Your Email</label>
+            <input type="email" id="rTeacherEmail" placeholder="you@university.dz" autocomplete="off">
+
+            <div class="form-row">
+                <div>
+                    <label>Date</label>
+                    <input type="date" id="rDate">
+                </div>
+                <div>
+                    <label>Time Slot</label>
+                    <select id="rTimeSlot">
+                        <option value="">Select slot</option>
+                        <option>08:30 – 10:00</option>
+                        <option>10:00 – 11:30</option>
+                        <option>11:30 – 13:00</option>
+                        <option>14:00 – 15:30</option>
+                        <option>15:30 – 17:00</option>
+
+                    </select>
+                </div>
+            </div>
+
+            <label>Reason / Purpose</label>
+            <textarea id="rReason" rows="3" placeholder="e.g. Practical session for 2nd year students…"></textarea>
+
+            <div class="modal-actions">
+                <button class="btn-modal-secondary" onclick="closeAll()">Cancel</button>
+                <button class="btn-modal-primary" onclick="submitReservation()">Send Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: ADD ROOM ══ -->
+    <div class="modal-overlay" id="addRoomModal">
+        <div class="modal">
+            <h2 class="modal-title">Add New <span>Room</span></h2>
+            <p class="modal-subtitle">Fill in the details for the new room</p>
+
+            <div class="form-row">
+                <div>
+                    <label>Room Name</label>
+                    <input type="text" id="aName" placeholder="e.g. Amphitheater A" autocomplete="off">
+                </div>
+                <div>
+                    <label>Room Number</label>
+                    <input type="text" id="aNumber" placeholder="e.g. AMP-A" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Capacity</label>
+                    <input type="number" id="aCapacity" placeholder="e.g. 80" min="1">
+                </div>
+                <div>
+                    <label>Type</label>
+                    <select id="aType">
+                        <option value="">Select type</option>
+                        <option>Lecture Hall</option>
+                        <option>Amphitheater</option>
+                        <option>Computer Lab</option>
+                        <option>Meeting Room</option>
+                        <option>Seminar Room</option>
+                        <option>Library</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Location</label>
+                    <input type="text" id="aLocation" placeholder="e.g. Building A, Floor 2" autocomplete="off">
+                </div>
+                <div>
+                    <label>Section</label>
+                    <select id="aSection">
+                        <option value="">Select section</option>
+                        <option value="Section A">Section A</option>
+                        <option value="Section B">Section B</option>
+                        <option value="Section C">Section C</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal-secondary" onclick="closeAll()">Cancel</button>
+                <button class="btn-modal-primary" onclick="submitAddRoom()">Add Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: EDIT ROOM ══ -->
+    <div class="modal-overlay" id="editRoomModal">
+        <div class="modal">
+            <h2 class="modal-title">Edit <span>Room</span></h2>
+            <p class="modal-subtitle">Update the room information below</p>
+            <input type="hidden" id="eRoomId">
+
+            <div class="form-row">
+                <div>
+                    <label>Room Name</label>
+                    <input type="text" id="eName" autocomplete="off">
+                </div>
+                <div>
+                    <label>Room Number</label>
+                    <input type="text" id="eNumber" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Capacity</label>
+                    <input type="number" id="eCapacity" min="1">
+                </div>
+                <div>
+                    <label>Type</label>
+                    <select id="eType">
+                        <option>Lecture Hall</option>
+                        <option>Amphitheater</option>
+                        <option>Computer Lab</option>
+                        <option>Meeting Room</option>
+                        <option>Seminar Room</option>
+                        <option>Library</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Location</label>
+                    <input type="text" id="eLocation" autocomplete="off">
+                </div>
+                <div>
+                    <label>Section</label>
+                    <select id="eSection">
+                        <option value="">No section</option>
+                        <option value="Section A">Section A</option>
+                        <option value="Section B">Section B</option>
+                        <option value="Section C">Section C</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>Status</label>
+            <select id="eStatus">
+                <option value="AVAILABLE">Available</option>
+                <option value="RESERVED">Reserved</option>
+                <option value="PENDING">Pending</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="btn-modal-secondary" onclick="closeAll()">Cancel</button>
+                <button class="btn-modal-primary" onclick="submitEditRoom()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: DELETE CONFIRM ══ -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="text-align:center; max-width:380px;">
+            <div class="delete-icon">🗑</div>
+            <h2 class="modal-title" style="text-align:center;">Delete <span>Room?</span></h2>
+            <p class="modal-subtitle" id="deleteRoomLabel" style="text-align:center; margin-bottom:2rem;"></p>
+            <input type="hidden" id="deleteRoomId">
+            <div class="modal-actions">
+                <button class="btn-modal-secondary" onclick="closeAll()">Cancel</button>
+                <button class="btn-delete-confirm" onclick="submitDelete()">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 50 });
+
+        const API = 'http://localhost:8080/api';
+        let allRooms = [];
+
+        /* ── ROLE-BASED ACCESS ─────────────────── */
+        const ADMIN_ROLES = ['SUPER_ADMIN', 'DIRECTOR_OF_INSTITUTE', 'HEAD_OF_DEPARTMENT', 'DIRECTOR_OF_STUDIES'];
+        const userRole = sessionStorage.getItem('role') || '';
+        const isAdmin = ADMIN_ROLES.includes(userRole);
+
+        // Apply role-based UI on page load
+        (function initRoleUI() {
+            document.getElementById('adminBar').classList.toggle('show', isAdmin);
+            document.getElementById('btnAddRoom').style.display = isAdmin ? 'flex' : 'none';
+            document.getElementById('navClassSchedules').style.display = isAdmin ? 'block' : 'none';
+        })();
+
+        /* ── HELPER ─────────────────────────────── */
+        const getAuthHeaders = (isJson = false) => {
+            const token = sessionStorage.getItem('jwt');
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (isJson) headers['Content-Type'] = 'application/json';
+            return headers;
+        };
+
+        /* ── LOAD ─────────────────────────────────── */
+        async function loadRooms() {
+            try {
+                const res = await fetch(`${API}/rooms/all`, { headers: getAuthHeaders() });
+                allRooms = await res.json();
+                renderRooms(allRooms);
+            } catch {
+                document.getElementById('roomsGrid').innerHTML =
+                    `<div class="loading-spinner" style="color:#ef4444;">⚠️ Cannot connect to server. Make sure Spring Boot is running.</div>`;
+            }
+        }
+
+        /* ── RENDER ───────────────────────────────── */
+        function renderRooms(list) {
+            const grid = document.getElementById('roomsGrid');
+            if (!list.length) {
+                grid.innerHTML = `<div class="loading-spinner">No rooms found.</div>`; return;
+            }
+            grid.innerHTML = list.map((room, i) => `
+        <div class="room-card" data-aos="fade-up" data-aos-delay="${i * 50}">
+          <div class="room-card-header">
+            <div>
+              <div class="room-name">${room.name}</div>
+              <div class="room-number">Room #${room.roomNumber || room.id}</div>
+            </div>
+            <span class="status-badge status-${room.status}">${room.status}</span>
+          </div>
+          <div class="room-info">
+            <div class="room-info-item">
+              <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              Capacity: <strong style="color:#fff">${room.capacity}</strong> students
+            </div>
+            <div class="room-info-item">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              ${room.location || 'Not specified'}${room.section ? ` &nbsp;·&nbsp; <span style="color:#9d4edd;font-size:0.78rem;">${room.section}</span>` : ''}
+            </div>
+            <div class="room-info-item">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+              ${room.type || 'General'}
+            </div>
+          </div>
+          <div class="card-actions">
+            ${room.status === 'AVAILABLE' ? `
+              <button class="btn-card btn-reserve-active" onclick="openReserveModal(${room.id}, '${room.name.replace(/'/g, "\\'")}')">Reserve Room</button>
+            ` : `
+              <button class="btn-card btn-reserve-disabled" disabled>Not Available</button>
+            `}
+            ${isAdmin ? `
+              <button class="btn-card btn-edit"   onclick="openEditModal(${room.id})">✏ Edit</button>
+              <button class="btn-card btn-delete" onclick="openDeleteModal(${room.id}, '${room.name.replace(/'/g, "\\'")}')">🗑 Delete</button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+            AOS.refresh();
+        }
+
+        function filterRooms(status, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderRooms(status === 'all' ? allRooms : allRooms.filter(r => r.status === status));
+        }
+
+        function filterBySection(section, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderRooms(allRooms.filter(r => r.section === section));
+        }
+
+        /* ── RESERVE ──────────────────────────────── */
+        function openReserveModal(id, name) {
+            document.getElementById('reserveRoomId').value = id;
+            document.getElementById('reserveRoomLabel').textContent = `Reserving: ${name}`;
+            document.getElementById('rDate').min = new Date().toISOString().split('T')[0];
+            document.getElementById('reserveModal').classList.add('open');
+        }
+
+        async function submitReservation() {
+            const roomId = document.getElementById('reserveRoomId').value;
+            const name = document.getElementById('rTeacherName').value.trim();
+            const email = document.getElementById('rTeacherEmail').value.trim();
+            const date = document.getElementById('rDate').value;
+            const slot = document.getElementById('rTimeSlot').value;
+            const reason = document.getElementById('rReason').value.trim();
+            if (!name || !email || !date || !slot || !reason)
+                return showToast('Please fill in all fields.', true);
+            try {
+                const res = await fetch(`${API}/reservations/request`, {
+                    method: 'POST', headers: getAuthHeaders(true),
+                    body: JSON.stringify({ roomId: +roomId, teacherName: name, teacherEmail: email, date, timeSlot: slot, reason })
+                });
+                res.ok ? (showToast('✅ Request sent! Waiting for admin approval.'), closeAll(), loadRooms())
+                    : showToast('❌ ' + await res.text(), true);
+            } catch { showToast('❌ Cannot connect to server.', true); }
+        }
+
+        /* ── ADD ROOM ─────────────────────────────── */
+        function openAddModal() {
+            ['aName', 'aNumber', 'aCapacity', 'aLocation'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('aType').value = '';
+            document.getElementById('aSection').value = '';
+            document.getElementById('addRoomModal').classList.add('open');
+        }
+
+        async function submitAddRoom() {
+            const name = document.getElementById('aName').value.trim();
+            const number = document.getElementById('aNumber').value.trim();
+            const capacity = document.getElementById('aCapacity').value;
+            const type = document.getElementById('aType').value;
+            const location = document.getElementById('aLocation').value.trim();
+            const section = document.getElementById('aSection').value;
+            if (!name || !number || !capacity || !type || !location)
+                return showToast('Please fill in all fields.', true);
+            try {
+                const res = await fetch(`${API}/rooms/add`, {
+                    method: 'POST', headers: getAuthHeaders(true),
+                    body: JSON.stringify({ name, roomNumber: number, capacity: +capacity, type, location, section })
+                });
+                res.ok ? (showToast('✅ Room added successfully!'), closeAll(), loadRooms())
+                    : showToast('❌ ' + await res.text(), true);
+            } catch { showToast('❌ Cannot connect to server.', true); }
+        }
+
+        /* ── EDIT ROOM ────────────────────────────── */
+        function openEditModal(id) {
+            const room = allRooms.find(r => r.id === id);
+            if (!room) return;
+            document.getElementById('eRoomId').value = id;
+            document.getElementById('eName').value = room.name;
+            document.getElementById('eNumber').value = room.roomNumber || '';
+            document.getElementById('eCapacity').value = room.capacity;
+            document.getElementById('eType').value = room.type || 'Lecture Hall';
+            document.getElementById('eLocation').value = room.location || '';
+            document.getElementById('eSection').value = room.section || '';
+            document.getElementById('eStatus').value = room.status;
+            document.getElementById('editRoomModal').classList.add('open');
+        }
+
+        async function submitEditRoom() {
+            const id = document.getElementById('eRoomId').value;
+            const name = document.getElementById('eName').value.trim();
+            const number = document.getElementById('eNumber').value.trim();
+            const capacity = document.getElementById('eCapacity').value;
+            const type = document.getElementById('eType').value;
+            const location = document.getElementById('eLocation').value.trim();
+            const section = document.getElementById('eSection').value;
+            const status = document.getElementById('eStatus').value;
+            if (!name || !number || !capacity || !type || !location)
+                return showToast('Please fill in all fields.', true);
+            try {
+                const res = await fetch(`${API}/rooms/update/${id}`, {
+                    method: 'PUT', headers: getAuthHeaders(true),
+                    body: JSON.stringify({ name, roomNumber: number, capacity: +capacity, type, location, section, status })
+                });
+                res.ok ? (showToast('✅ Room updated!'), closeAll(), loadRooms())
+                    : showToast('❌ ' + await res.text(), true);
+            } catch { showToast('❌ Cannot connect to server.', true); }
+        }
+
+        /* ── DELETE ROOM ──────────────────────────── */
+        function openDeleteModal(id, name) {
+            document.getElementById('deleteRoomId').value = id;
+            document.getElementById('deleteRoomLabel').textContent = `"${name}" will be permanently removed.`;
+            document.getElementById('deleteModal').classList.add('open');
+        }
+
+        async function submitDelete() {
+            const id = document.getElementById('deleteRoomId').value;
+            try {
+                const res = await fetch(`${API}/rooms/delete/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                res.ok ? (showToast('🗑 Room deleted.'), closeAll(), loadRooms())
+                    : showToast('❌ ' + await res.text(), true);
+            } catch { showToast('❌ Cannot connect to server.', true); }
+        }
+
+        /* ── HELPERS ──────────────────────────────── */
+        function closeAll() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+        }
+        document.querySelectorAll('.modal-overlay').forEach(o =>
+            o.addEventListener('click', e => { if (e.target === o) closeAll(); })
+        );
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast' + (isError ? ' error' : '');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        loadRooms();
+    </script>
+</body>
+
+</html>

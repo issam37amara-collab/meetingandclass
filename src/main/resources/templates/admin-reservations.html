@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Reservations Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .blob-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(127, 66, 167, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .blob-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(102, 0, 197, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 40px);
+            }
+        }
+
+        .glass-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .glass-nav .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #a7a7a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .glass-nav ul {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .glass-nav a {
+            text-decoration: none;
+            color: #d1d1d1;
+            font-weight: 400;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .glass-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, #7f42a7, #6600c5);
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav a:hover {
+            color: #ffffff;
+        }
+
+        .glass-nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 200;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #d1d1d1;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dropdown-content a::after {
+            display: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #ffffff;
+        }
+
+
+
+        .admin-badge {
+            background: rgba(157, 78, 221, 0.2);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            color: #9d4edd;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            padding: 3rem 5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header h1 span {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* STATS */
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            padding: 0 5rem 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 1.2rem 2rem;
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(157, 78, 221, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        .stat-pending .stat-number {
+            color: #eab308;
+        }
+
+        .stat-approved .stat-number {
+            color: #22c55e;
+        }
+
+        .stat-refused .stat-number {
+            color: #ef4444;
+        }
+
+        .stat-total .stat-number {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* FILTER TABS */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 5rem 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #d1d1d1;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(90, 24, 154, 0.3);
+        }
+
+        /* RESERVATIONS TABLE */
+        .table-section {
+            padding: 0 5rem 4rem;
+        }
+
+        .request-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(16px);
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .request-card.pending::before {
+            background: #eab308;
+        }
+
+        .request-card.approved::before {
+            background: #22c55e;
+        }
+
+        .request-card.refused::before {
+            background: #ef4444;
+        }
+
+        .request-card:hover {
+            border-color: rgba(157, 78, 221, 0.2);
+            transform: translateX(3px);
+        }
+
+        .request-main h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .request-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.6rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #a0a0a0;
+            font-size: 0.85rem;
+        }
+
+        .meta-item svg {
+            width: 14px;
+            height: 14px;
+            fill: #7f42a7;
+        }
+
+        .request-details {
+            border-left: 1px solid rgba(255, 255, 255, 0.07);
+            padding-left: 1.5rem;
+        }
+
+        .detail-label {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            color: #d1d1d1;
+            font-size: 0.95rem;
+        }
+
+        .reason-text {
+            color: #a0a0a0;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .request-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            min-width: 130px;
+        }
+
+        .btn-action {
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-approve {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-approve:hover {
+            background: rgba(34, 197, 94, 0.3);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-refuse {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-refuse:hover {
+            background: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .status-text {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        .status-text.approved {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .status-text.refused {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pending {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .badge-approved {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-refused {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: #888;
+            font-size: 1.1rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(157, 78, 221, 0.3);
+            border-top-color: #9d4edd;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #22c55e;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        @media (max-width: 900px) {
+
+            .glass-nav,
+            .page-header,
+            .stats-bar,
+            .filter-tabs,
+            .table-section {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .request-card {
+                grid-template-columns: 1fr;
+            }
+
+            .request-details {
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.07);
+                padding: 1rem 0 0;
+            }
+
+            .request-actions {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-nav" data-aos="fade-down" data-aos-duration="100">
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+        <ul>
+            <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
+            <li><a href="menu.html">University</a></li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Meetings</a>
+                <div class="dropdown-content">
+                    <a href="index.html">New Meeting</a>
+                    <a href="summary.html">All Meetings</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Rooms</a>
+                <div class="dropdown-content">
+                    <a href="rooms.html">View Rooms</a>
+                    <a href="admin-reservations.html">Reservations</a>
+                </div>
+            </li>
+
+            <li><a href="class-timetable.html" style="color:#9d4edd">Class Schedules</a></li>
+        </ul>
+        <span class="admin-badge">⚙ ADMIN</span>
+        <div class="nav-right">
+
+            <button class="btn-signin" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="page-header" data-aos="fade-up" data-aos-duration="100">
+        <h1>Reservation <span>Requests</span></h1>
+    </div>
+
+    <div class="stats-bar" data-aos="fade-up" data-aos-duration="100" data-aos-delay="100">
+        <div class="stat-card stat-total">
+            <div class="stat-number" id="statTotal">—</div>
+            <div class="stat-label">Total Requests</div>
+        </div>
+        <div class="stat-card stat-pending">
+            <div class="stat-number" id="statPending">—</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card stat-approved">
+            <div class="stat-number" id="statApproved">—</div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-card stat-refused">
+            <div class="stat-number" id="statRefused">—</div>
+            <div class="stat-label">Refused</div>
+        </div>
+    </div>
+
+    <div class="filter-tabs" data-aos="fade-up" data-aos-duration="100" data-aos-delay="50">
+        <button class="tab-btn active" onclick="filterRequests('all', this)">All</button>
+        <button class="tab-btn" onclick="filterRequests('PENDING', this)">Pending</button>
+        <button class="tab-btn" onclick="filterRequests('APPROVED', this)">Approved</button>
+        <button class="tab-btn" onclick="filterRequests('REFUSED', this)">Refused</button>
+    </div>
+
+    <section class="table-section" id="requestsList">
+        <div class="loading-spinner">
+            <div class="spinner"></div> Loading requests...
+        </div>
+    </section>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 50 });
+
+        // Require authentication for admin roles
+        requireAuth(['HEAD_OF_DEPARTMENT', 'DIRECTOR_OF_INSTITUTE', 'DIRECTOR_OF_STUDIES', 'SUPER_ADMIN']);
+
+        let allRequests = [];
+
+        async function loadRequests() {
+            try {
+                const data = await apiGet('/api/reservations/all');
+                if (data) {
+                    allRequests = data;
+                    updateStats(allRequests);
+                    renderRequests(allRequests);
+                }
+            } catch (err) {
+                document.getElementById('requestsList').innerHTML =
+                    `<div class="empty-state" style="color:#ef4444;">⚠️ Cannot connect to server. Make sure Spring Boot is running.</div>`;
+            }
+        }
+
+        function updateStats(requests) {
+            document.getElementById('statTotal').textContent = requests.length;
+            document.getElementById('statPending').textContent = requests.filter(r => r.status === 'PENDING').length;
+            document.getElementById('statApproved').textContent = requests.filter(r => r.status === 'APPROVED').length;
+            document.getElementById('statRefused').textContent = requests.filter(r => r.status === 'REFUSED').length;
+        }
+
+        function filterRequests(status, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderRequests(status === 'all' ? allRequests : allRequests.filter(r => r.status === status));
+        }
+
+        function renderRequests(list) {
+            const container = document.getElementById('requestsList');
+            if (list.length === 0) {
+                container.innerHTML = `<div class="empty-state">No requests found.</div>`;
+                return;
+            }
+            container.innerHTML = list.map((req, i) => `
+        <div class="request-card ${req.status.toLowerCase()}" data-aos="fade-up" data-aos-delay="${i * 50}">
+          <div class="request-main">
+            <h3>
+              ${req.roomName || 'Room #' + req.roomId}
+              <span class="status-badge badge-${req.status.toLowerCase()}">${req.status}</span>
+            </h3>
+            <div class="request-meta">
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+                ${req.teacherName}
+              </span>
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                ${req.teacherEmail}
+              </span>
+            </div>
+          </div>
+
+          <div class="request-details">
+            <div class="detail-label">Date &amp; Time</div>
+            <div class="detail-value">${req.date} &nbsp;|&nbsp; ${req.timeSlot}</div>
+            <div class="reason-text">"${req.reason}"</div>
+          </div>
+
+          <div class="request-actions">
+            ${req.status === 'PENDING' ? `
+              <button class="btn-action btn-approve" onclick="respond(${req.id}, 'APPROVED')">✓ Approve</button>
+              <button class="btn-action btn-refuse"  onclick="respond(${req.id}, 'REFUSED')">✕ Refuse</button>
+            ` : `
+              <div class="status-text ${req.status.toLowerCase()}">
+                ${req.status === 'APPROVED' ? '✓ Approved' : '✕ Refused'}
+              </div>
+            `}
+          </div>
+        </div>
+      `).join('');
+            AOS.refresh();
+        }
+
+        async function respond(id, decision) {
+            try {
+                // The backend endpoints are /api/reservations/{id}/approved and /api/reservations/{id}/refused
+                const data = await apiPut(`/api/reservations/${id}/${decision.toLowerCase()}`);
+                if (data) {
+                    showToast(decision === 'APPROVED' ? '✅ Reservation approved!' : '❌ Reservation refused.');
+                    loadRequests();
+                } else {
+                    showToast('Failed to update reservation.', true);
+                }
+            } catch (e) {
+                showToast('Cannot connect to server.', true);
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        loadRequests();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - University Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .blob-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(127, 66, 167, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .blob-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(102, 0, 197, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 40px);
+            }
+        }
+
+        /* ── NAV ── */
+        .glass-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .glass-nav .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #a7a7a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .glass-nav ul {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .glass-nav a {
+            text-decoration: none;
+            color: #d1d1d1;
+            font-weight: 400;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .glass-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, #7f42a7, #6600c5);
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav a:hover {
+            color: #fff;
+        }
+
+        .glass-nav a:hover::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 200;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #d1d1d1;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            text-align: center;
+            text-transform: none;
+            letter-spacing: normal;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .dropdown-content a::after {
+            display: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #fff;
+        }
+
+        .btn-signin {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-signin:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 2rem 1.5rem;
+            z-index: 10;
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.6rem;
+        }
+
+        .page-header h1 span {
+            background: linear-gradient(to right, #9d4edd, #5a189a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: #a0a0a0;
+            font-size: 1.05rem;
+            font-weight: 300;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: rgba(157, 78, 221, 0.15);
+            color: #cda4ff;
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* ── GRID ── */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 5rem 4rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(157, 78, 221, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card .title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card .desc {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <nav class="glass-nav">
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+        <ul>
+            <li><a href="menu.html">Home</a></li>
+            <li class="dropdown">
+                <a href="#">Rooms ▼</a>
+                <div class="dropdown-content">
+                    <a href="Rooms.html">All Rooms</a>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#">Meetings ▼</a>
+                <div class="dropdown-content">
+                    <a href="summary.html">All Meetings</a>
+                </div>
+            </li>
+        </ul>
+        <div class="nav-right">
+            <button class="btn-signin" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="page-header" data-aos="fade-down">
+        <div class="role-badge">TEACHER</div>
+        <h1>Welcome, <span id="nameLabel"></span>!</h1>
+        <p>Access your classes, view your schedule, and manage your academic activities.</p>
+    </div>
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="grid">
+            <a class="card" href="summary.html">
+                <div class="icon">📋</div>
+                <div class="title">My Meetings</div>
+                <div class="desc">View and download meeting summaries</div>
+            </a>
+            <a class="card" href="Rooms.html">
+                <div class="icon">🚪</div>
+                <div class="title">Reserve a Room</div>
+                <div class="desc">Check availability and book rooms</div>
+            </a>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        AOS.init({ once: true, offset: 50 });
+        requireAuth(['TEACHER']);
+        document.getElementById('nameLabel').textContent = getFullName();
+    </script>
+</body>
+
+</html>

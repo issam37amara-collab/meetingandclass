@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timetable Management - University Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', system-ui, sans-serif;
+      background-color: #050505;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .blob-1 {
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, rgba(127, 66, 167, 0.38) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: -1;
+      animation: float 8s ease-in-out infinite alternate;
+    }
+
+    .blob-2 {
+      position: fixed;
+      bottom: -20%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(102, 0, 197, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      animation: float 12s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      100% {
+        transform: translate(20px, 40px);
+      }
+    }
+
+    /* ── NAV ── */
+    .glass-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 5rem;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .glass-nav .logo {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #fff, #a7a7a7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .glass-nav ul {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .glass-nav a {
+      text-decoration: none;
+      color: #d1d1d1;
+      font-size: 1rem;
+      transition: color 0.3s;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .glass-nav a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: linear-gradient(90deg, #7f42a7, #6600c5);
+      transition: width 0.3s;
+    }
+
+    .glass-nav a:hover {
+      color: #fff;
+    }
+
+    .glass-nav a:hover::after {
+      width: 100%;
+    }
+
+    .admin-chip {
+      background: rgba(157, 78, 221, 0.18);
+      border: 1px solid rgba(157, 78, 221, 0.35);
+      color: #b07eee;
+      padding: 0.4rem 1.1rem;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 3rem 5rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-header h1 span {
+      background: linear-gradient(to right, #9d4edd, #5a189a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-header p {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
+
+    .btn-add {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.8rem;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #5a189a, #9d4edd);
+      color: white;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(90, 24, 154, 0.3);
+      white-space: nowrap;
+    }
+
+    .btn-add:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    /* ── DAY TABS ── */
+    .day-tabs {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0 5rem 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .day-tab {
+      padding: 0.55rem 1.4rem;
+      border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: #aaa;
+    }
+
+    .day-tab:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .day-tab.active {
+      background: linear-gradient(90deg, #5a189a, #9d4edd);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 5px 16px rgba(90, 24, 154, 0.35);
+    }
+
+    .day-tab.today {
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .day-tab.today.active {
+      background: linear-gradient(90deg, #166534, #22c55e);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    /* ── SCHEDULE GRID ── */
+    .schedule-section {
+      padding: 0 5rem 5rem;
+    }
+
+    /* Time column + room columns layout */
+    .schedule-wrapper {
+      overflow-x: auto;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: 80px repeat(var(--room-count, 4), minmax(200px, 1fr));
+      gap: 0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      overflow: hidden;
+      min-width: 600px;
+    }
+
+    .grid-header {
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #888;
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .grid-header.time-col {
+      color: #555;
+    }
+
+    .grid-header.room-name {
+      color: #d1d1d1;
+    }
+
+    .grid-header small {
+      display: block;
+      color: #555;
+      font-size: 0.72rem;
+      margin-top: 0.2rem;
+      font-weight: 400;
+    }
+
+    .time-slot-row {
+      display: contents;
+    }
+
+    .time-label {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.78rem;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .slot-cell {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      min-height: 56px;
+      padding: 0.3rem;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .slot-cell:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .slot-cell:last-child {
+      border-right: none;
+    }
+
+    /* Class block inside a slot */
+    .class-block {
+      background: rgba(90, 24, 154, 0.25);
+      border: 1px solid rgba(157, 78, 221, 0.35);
+      border-left: 3px solid #9d4edd;
+      border-radius: 8px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .class-block:hover {
+      background: rgba(90, 24, 154, 0.4);
+      transform: scale(1.01);
+    }
+
+    .class-block .cb-course {
+      font-weight: 700;
+      color: #d1b3ff;
+    }
+
+    .class-block .cb-code {
+      color: #9d4edd;
+      font-size: 0.72rem;
+    }
+
+    .class-block .cb-group {
+      color: #888;
+      font-size: 0.72rem;
+    }
+
+    .class-block .cb-teacher {
+      color: #aaa;
+      font-size: 0.72rem;
+    }
+
+    .class-block .cb-time {
+      color: #666;
+      font-size: 0.7rem;
+      margin-top: 0.2rem;
+    }
+
+    .class-block .block-actions {
+      display: none;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      gap: 3px;
+    }
+
+    .class-block:hover .block-actions {
+      display: flex;
+    }
+
+    .block-btn {
+      padding: 0.15rem 0.4rem;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .block-btn-edit {
+      background: rgba(234, 179, 8, 0.2);
+      color: #eab308;
+    }
+
+    .block-btn-delete {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .block-btn:hover {
+      filter: brightness(1.4);
+    }
+
+    /* Current time indicator */
+    .now-badge {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 50px;
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-left: 0.3rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    /* Empty state */
+    .empty-day {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem;
+      color: #444;
+      font-size: 1rem;
+    }
+
+    .empty-day span {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* List view fallback */
+    .entry-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .entry-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-left: 3px solid #9d4edd;
+      border-radius: 14px;
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      transition: all 0.2s;
+    }
+
+    .entry-card:hover {
+      border-color: rgba(157, 78, 221, 0.3);
+      transform: translateX(3px);
+    }
+
+    .entry-main h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e0c9ff;
+      margin-bottom: 0.3rem;
+    }
+
+    .entry-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .meta-pill {
+      padding: 0.2rem 0.7rem;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      background: rgba(255, 255, 255, 0.06);
+      color: #aaa;
+    }
+
+    .meta-pill.time {
+      background: rgba(90, 24, 154, 0.2);
+      color: #9d4edd;
+    }
+
+    .meta-pill.room {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .entry-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-icon-edit {
+      background: rgba(234, 179, 8, 0.12);
+      color: #eab308;
+      border: 1px solid rgba(234, 179, 8, 0.25);
+    }
+
+    .btn-icon-delete {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-icon:hover {
+      filter: brightness(1.4);
+      transform: translateY(-1px);
+    }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      padding: 0 5rem 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 0.7rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stat-pill .snum {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .stat-pill .slabel {
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    .stat-pill.purple .snum {
+      color: #9d4edd;
+    }
+
+    .stat-pill.green .snum {
+      color: #22c55e;
+    }
+
+    .stat-pill.yellow .snum {
+      color: #eab308;
+    }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #0d0d0d;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 2.2rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+      animation: slideUp 0.3s ease;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+
+    .modal-title span {
+      background: linear-gradient(to right, #9d4edd, #5a189a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-subtitle {
+      color: #555;
+      font-size: 0.86rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 0.9rem;
+    }
+
+    .form-row>div {
+      flex: 1;
+    }
+
+    .modal label {
+      display: block;
+      color: #b0b0b0;
+      margin-bottom: 0.4rem;
+      font-size: 0.86rem;
+    }
+
+    .modal input,
+    .modal select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .modal input:focus,
+    .modal select:focus {
+      border-color: #9d4edd;
+      box-shadow: 0 0 10px rgba(157, 78, 221, 0.2);
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .modal select option {
+      background: #1a1a1a;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.7rem;
+      margin-top: 0.3rem;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 0.82rem;
+      background: linear-gradient(90deg, #5a189a, #9d4edd);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 0.82rem;
+      background: rgba(255, 255, 255, 0.05);
+      color: #d1d1d1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-danger {
+      flex: 1;
+      padding: 0.82rem;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.28);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.9rem 1.4rem;
+      border-radius: 12px;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s;
+      backdrop-filter: blur(10px);
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+    }
+
+    .spinner-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      gap: 0.8rem;
+      color: #555;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(157, 78, 221, 0.3);
+      border-top-color: #9d4edd;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 900px) {
+
+      .glass-nav,
+      .page-header,
+      .day-tabs,
+      .schedule-section,
+      .stats-row {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+
+      .glass-nav ul {
+        display: none;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob-1"></div>
+  <div class="blob-2"></div>
+
+  <!-- NAV -->
+  <nav class="glass-nav" data-aos="fade-down" data-aos-duration="1000">
+    <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+    <ul>
+      <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
+      <li><a href="menu.html">University</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="admin-reservations.html">Reservations</a></li>
+      <li><a href="timetable.html">Timetable</a></li>
+    </ul>
+    <div class="nav-right" style="display: flex; gap: 1rem; align-items: center;">
+      <span class="admin-chip">⚙ ADMIN</span>
+      <button class="btn-signin" onclick="logout()"
+        style="background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.6rem 1.5rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; cursor: pointer;">Logout</button>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <div class="page-header" data-aos="fade-up" data-aos-duration="1000">
+    <div>
+      <h1>University <span>Timetable</span></h1>
+      <p>Manage the weekly schedule — rooms update automatically based on this data</p>
+    </div>
+    <button class="btn-add" onclick="openAddModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
+      Add Class
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" data-aos="fade-up" data-aos-delay="80">
+    <div class="stat-pill purple">
+      <div>
+        <div class="snum" id="statTotal">–</div>
+        <div class="slabel">Total Classes</div>
+      </div>
+    </div>
+    <div class="stat-pill green">
+      <div>
+        <div class="snum" id="statToday">–</div>
+        <div class="slabel">Today's Classes</div>
+      </div>
+    </div>
+    <div class="stat-pill yellow">
+      <div>
+        <div class="snum" id="statRooms">–</div>
+        <div class="slabel">Rooms Used</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY TABS -->
+  <div class="day-tabs" id="dayTabs" data-aos="fade-up" data-aos-delay="120">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- SCHEDULE -->
+  <section class="schedule-section" data-aos="fade-up" data-aos-delay="160">
+    <div id="scheduleContainer">
+      <div class="spinner-wrap">
+        <div class="spinner"></div> Loading timetable…
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MODAL: ADD / EDIT ══ -->
+  <div class="modal-overlay" id="entryModal">
+    <div class="modal">
+      <h2 class="modal-title" id="entryModalTitle">Add <span>Class</span></h2>
+      <p class="modal-subtitle">Schedule a class in a room for a specific day and time</p>
+      <input type="hidden" id="entryId">
+
+      <div class="form-row">
+        <div>
+          <label>Room</label>
+          <select id="fRoom"></select>
+        </div>
+        <div>
+          <label>Day of Week</label>
+          <select id="fDay">
+            <option value="MONDAY">Monday</option>
+            <option value="TUESDAY">Tuesday</option>
+            <option value="WEDNESDAY">Wednesday</option>
+            <option value="THURSDAY">Thursday</option>
+            <option value="FRIDAY">Friday</option>
+            <option value="SATURDAY">Saturday</option>
+            <option value="SUNDAY">Sunday</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label>Start Time</label>
+          <input type="time" id="fStart">
+        </div>
+        <div>
+          <label>End Time</label>
+          <input type="time" id="fEnd">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label>Course Name</label>
+          <input type="text" id="fCourse" placeholder="e.g. Advanced Mathematics" autocomplete="off">
+        </div>
+        <div>
+          <label>Course Code</label>
+          <input type="text" id="fCode" placeholder="e.g. MATH301" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label>Teacher</label>
+          <input type="text" id="fTeacher" placeholder="e.g. Dr. Amara" autocomplete="off">
+        </div>
+        <div>
+          <label>Student Group</label>
+          <input type="text" id="fGroup" placeholder="e.g. Group A – 2nd Year" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitEntry()">Save Class</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: DELETE CONFIRM ══ -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width:360px; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:1rem;">🗑</div>
+      <h2 class="modal-title" style="text-align:center;">Delete <span>Class?</span></h2>
+      <p class="modal-subtitle" id="deleteLabel" style="text-align:center; margin-bottom:2rem;"></p>
+      <input type="hidden" id="deleteId">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-danger" onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    AOS.init({ once: true, offset: 50 });
+
+    const API = 'http://localhost:8080/api';
+
+    const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+    const DAY_LABELS = {
+      MONDAY: 'Monday', TUESDAY: 'Tuesday', WEDNESDAY: 'Wednesday',
+      THURSDAY: 'Thursday', FRIDAY: 'Friday', SATURDAY: 'Saturday', SUNDAY: 'Sunday'
+    };
+
+    // Time slots displayed in the grid
+    const TIME_SLOTS = [
+      '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+      '16:00', '16:30', '17:00', '17:30', '18:00'
+    ];
+
+    let allEntries = [];
+    let allRooms = [];
+    let activeDay = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]; // default to today
+
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    async function init() {
+      await Promise.all([loadRooms(), loadEntries()]);
+      buildDayTabs();
+      renderDay(activeDay);
+    }
+
+    async function loadRooms() {
+      try {
+        const res = await fetch(`${API}/rooms/all`);
+        allRooms = await res.json();
+        populateRoomSelect();
+      } catch { allRooms = []; }
+    }
+
+    async function loadEntries() {
+      try {
+        const res = await fetch(`${API}/timetable/all`);
+        allEntries = await res.json();
+        updateStats();
+      } catch {
+        document.getElementById('scheduleContainer').innerHTML =
+          `<div class="spinner-wrap" style="color:#ef4444">⚠️ Cannot connect to server.</div>`;
+      }
+    }
+
+    function populateRoomSelect() {
+      const sel = document.getElementById('fRoom');
+      sel.innerHTML = allRooms.map(r =>
+        `<option value="${r.id}">${r.name} (${r.roomNumber})</option>`
+      ).join('');
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = allEntries.length;
+      const todayDay = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+      document.getElementById('statToday').textContent =
+        allEntries.filter(e => e.dayOfWeek === todayDay).length;
+      const roomSet = new Set(allEntries.map(e => e.roomId));
+      document.getElementById('statRooms').textContent = roomSet.size;
+    }
+
+    // ── DAY TABS ──────────────────────────────────────────────────────────────
+    function buildDayTabs() {
+      const todayDay = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+      document.getElementById('dayTabs').innerHTML = DAYS.map(d => `
+        <button class="day-tab ${d === activeDay ? 'active' : ''} ${d === todayDay ? 'today' : ''}"
+                onclick="switchDay('${d}', this)">
+          ${DAY_LABELS[d]}
+          ${d === todayDay ? '<span class="now-badge">TODAY</span>' : ''}
+        </button>
+      `).join('');
+    }
+
+    function switchDay(day, btn) {
+      activeDay = day;
+      document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDay(day);
+    }
+
+    // ── RENDER DAY ────────────────────────────────────────────────────────────
+    function renderDay(day) {
+      const dayEntries = allEntries.filter(e => e.dayOfWeek === day);
+      const container = document.getElementById('scheduleContainer');
+
+      if (!allRooms.length) {
+        container.innerHTML = `<div class="spinner-wrap">No rooms configured yet.</div>`;
+        return;
+      }
+
+      if (!dayEntries.length) {
+        container.innerHTML = `
+          <div class="entry-list">
+            <div style="text-align:center; padding:3rem; color:#444;">
+              <span style="font-size:2.5rem; display:block; margin-bottom:0.5rem;">📅</span>
+              No classes scheduled for ${DAY_LABELS[day]}.<br>
+              <span style="font-size:0.85rem; color:#333; margin-top:0.5rem; display:block;">
+                Click "Add Class" to schedule one.
+              </span>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // Render as a list (simpler and cleaner for this use case)
+      container.innerHTML = `<div class="entry-list">${dayEntries
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+        .map(entry => `
+          <div class="entry-card" data-aos="fade-up">
+            <div class="entry-main">
+              <h3>${entry.courseName} <span style="color:#9d4edd; font-size:0.8rem;">${entry.courseCode || ''}</span></h3>
+              <div class="entry-meta">
+                <span class="meta-pill time">🕐 ${entry.startTime} – ${entry.endTime}</span>
+                <span class="meta-pill room">🏛 ${entry.roomName || 'Room #' + entry.roomId}</span>
+                ${entry.teacherName ? `<span class="meta-pill">👨‍🏫 ${entry.teacherName}</span>` : ''}
+                ${entry.studentGroup ? `<span class="meta-pill">👥 ${entry.studentGroup}</span>` : ''}
+              </div>
+            </div>
+            <div class="entry-actions">
+              <button class="btn-icon btn-icon-edit"   onclick="openEditModal(${entry.id})">✏ Edit</button>
+              <button class="btn-icon btn-icon-delete" onclick="openDeleteModal(${entry.id}, '${(entry.courseName || '').replace(/'/g, "\\'")}')">🗑 Delete</button>
+            </div>
+          </div>
+        `).join('')
+        }</div>`;
+      AOS.refresh();
+    }
+
+    // ── ADD MODAL ─────────────────────────────────────────────────────────────
+    function openAddModal() {
+      document.getElementById('entryId').value = '';
+      document.getElementById('entryModalTitle').innerHTML = 'Add <span>Class</span>';
+      document.getElementById('fDay').value = activeDay;
+      document.getElementById('fStart').value = '';
+      document.getElementById('fEnd').value = '';
+      document.getElementById('fCourse').value = '';
+      document.getElementById('fCode').value = '';
+      document.getElementById('fTeacher').value = '';
+      document.getElementById('fGroup').value = '';
+      if (allRooms.length) document.getElementById('fRoom').selectedIndex = 0;
+      document.getElementById('entryModal').classList.add('open');
+    }
+
+    // ── EDIT MODAL ────────────────────────────────────────────────────────────
+    function openEditModal(id) {
+      const e = allEntries.find(x => x.id === id);
+      if (!e) return;
+      document.getElementById('entryId').value = id;
+      document.getElementById('entryModalTitle').innerHTML = 'Edit <span>Class</span>';
+      document.getElementById('fRoom').value = e.roomId;
+      document.getElementById('fDay').value = e.dayOfWeek;
+      document.getElementById('fStart').value = e.startTime;
+      document.getElementById('fEnd').value = e.endTime;
+      document.getElementById('fCourse').value = e.courseName || '';
+      document.getElementById('fCode').value = e.courseCode || '';
+      document.getElementById('fTeacher').value = e.teacherName || '';
+      document.getElementById('fGroup').value = e.studentGroup || '';
+      document.getElementById('entryModal').classList.add('open');
+    }
+
+    // ── SUBMIT ADD/EDIT ────────────────────────────────────────────────────────
+    async function submitEntry() {
+      const id = document.getElementById('entryId').value;
+      const roomId = document.getElementById('fRoom').value;
+      const day = document.getElementById('fDay').value;
+      const start = document.getElementById('fStart').value;
+      const end = document.getElementById('fEnd').value;
+      const course = document.getElementById('fCourse').value.trim();
+      const code = document.getElementById('fCode').value.trim();
+      const teacher = document.getElementById('fTeacher').value.trim();
+      const group = document.getElementById('fGroup').value.trim();
+
+      if (!roomId || !day || !start || !end || !course)
+        return showToast('Please fill in Room, Day, Times, and Course Name.', true);
+
+      if (start >= end)
+        return showToast('End time must be after start time.', true);
+
+      const body = {
+        roomId: +roomId, dayOfWeek: day, startTime: start, endTime: end,
+        courseName: course, courseCode: code, teacherName: teacher, studentGroup: group
+      };
+
+      const url = id ? `${API}/timetable/update/${id}` : `${API}/timetable/add`;
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          showToast(id ? '✅ Class updated!' : '✅ Class added!');
+          closeModal(); await loadEntries(); renderDay(activeDay);
+          // Also trigger a sync so rooms update immediately
+          fetch(`${API}/timetable/sync`, { method: 'POST' }).catch(() => { });
+        } else {
+          showToast('❌ ' + await res.text(), true);
+        }
+      } catch { showToast('❌ Cannot connect to server.', true); }
+    }
+
+    // ── DELETE ─────────────────────────────────────────────────────────────────
+    function openDeleteModal(id, name) {
+      document.getElementById('deleteId').value = id;
+      document.getElementById('deleteLabel').textContent = `"${name}" will be removed from the timetable.`;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    async function confirmDelete() {
+      const id = document.getElementById('deleteId').value;
+      try {
+        const res = await fetch(`${API}/timetable/delete/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('🗑 Class removed from timetable.');
+          closeModal(); await loadEntries(); renderDay(activeDay);
+          fetch(`${API}/timetable/sync`, { method: 'POST' }).catch(() => { });
+        } else {
+          showToast('❌ ' + await res.text(), true);
+        }
+      } catch { showToast('❌ Cannot connect to server.', true); }
+    }
+
+    function closeModal() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    }
+    document.querySelectorAll('.modal-overlay').forEach(o =>
+      o.addEventListener('click', e => { if (e.target === o) closeModal(); })
+    );
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 4000);
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Summaries - University Hub</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Arabic font support -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Using Tajawal for Arabic, Outfit for English fallbacks */
+            font-family: 'Tajawal', 'Outfit', system-ui, -apple-system, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Abstract glowing blobs for premium aesthetic */
+        .blob-1 {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(127, 66, 167, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .blob-2 {
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(102, 0, 197, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(-20px, 40px);
+            }
+        }
+
+        /* Modern Glassmorphism Navigation */
+        .glass-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .glass-nav .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: 'Outfit';
+            background: linear-gradient(90deg, #fff, #a7a7a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .glass-nav ul {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .glass-nav a {
+            text-decoration: none;
+            color: #d1d1d1;
+            font-weight: 400;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .glass-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            right: 0;
+            background: linear-gradient(90deg, #7f42a7, #6600c5);
+            transition: width 0.3s ease;
+        }
+
+        .glass-nav a:hover {
+            color: #ffffff;
+        }
+
+        .glass-nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 180px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 200;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #d1d1d1;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dropdown-content a::after {
+            display: none;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(157, 78, 221, 0.2);
+            color: #ffffff;
+        }
+
+        .btn-signin {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signin:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            color: #fff;
+        }
+
+        /* Main Section Container */
+        .container {
+            max-width: 900px;
+            margin: 4rem auto;
+            position: relative;
+            z-index: 10;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            display: inline-block;
+            width: 100%;
+            padding-bottom: 15px;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .meetings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Glassmorphism Meeting Card matching the logic injected elements */
+        .meeting-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .meeting-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(157, 78, 221, 0.3);
+            box-shadow: 0 20px 40px rgba(90, 24, 154, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .meeting-card h3 {
+            color: #ffffff;
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .meeting-info {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            color: #d1d1d1;
+        }
+
+        .upload-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            margin-bottom: 10px;
+            color: #a7a7a7;
+            font-family: inherit;
+        }
+
+        /* Customizing file input button */
+        input[type="file"]::file-selector-button {
+            border: 1px solid rgba(157, 78, 221, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-inline-end: 1rem;
+            font-family: inherit;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(157, 78, 221, 0.2);
+        }
+
+        .meeting-card button {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(90deg, #5a189a, #9d4edd);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(90, 24, 154, 0.2);
+            font-family: inherit;
+        }
+
+        .meeting-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(90, 24, 154, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .status-msg {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .glass-nav {
+                padding: 1rem 2rem;
+            }
+
+            .glass-nav ul {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+
+    <nav class="glass-nav" data-aos="fade-down" data-aos-duration="1000">
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
+        <ul>
+            <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
+            <li><a href="menu.html">University</a></li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Meetings</a>
+                <div class="dropdown-content">
+                    <a href="index.html">New Meeting</a>
+                    <a href="summary.html">All Meetings</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#" style="cursor:default;">Rooms</a>
+                <div class="dropdown-content">
+                    <a href="rooms.html">View Rooms</a>
+                    <a href="admin-reservations.html">Reservations</a>
+                </div>
+            </li>
+
+            <li><a href="class-timetable.html" style="color:#9d4edd">Class Schedules</a></li>
+        </ul>
+        <div class="nav-right">
+
+            <button class="btn-signin" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container" data-aos="fade-up" data-aos-duration="1200">
+        <h2>Manage Meeting Summaries</h2>
+
+        <div id="meetingsList" class="meetings-grid">
+            <!-- Items injected by summary-logic.js -->
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="auth.js"></script>
+    <script>AOS.init({ once: true, offset: 50 });</script>
+    <script src="summary-logic.js"></script>
+</body>
+
+</html>
