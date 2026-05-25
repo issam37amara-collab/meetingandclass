@@ -1,5 +1,5 @@
 // ── auth.js — shared JWT utilities ──────────────────────────────────────────
-const AUTH_API = 'http://localhost:8080';
+const AUTH_API = '';
 
 function getToken()    { return sessionStorage.getItem('jwt'); }
 function getRole()     { return sessionStorage.getItem('role'); }
