@@ -32,7 +32,7 @@ document.getElementById('meetingForm').addEventListener('submit', function (e) {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': 'Bearer ' + sessionStorage.getItem('jwt')
+            'Authorization': 'Bearer ' + localStorage.getItem('jwt')
         },
         body: JSON.stringify(meetingData)
     })

@@ -1012,12 +1012,12 @@
     <script>
         AOS.init({ once: true, offset: 50 });
 
-        const API = '/api';
+        const API = 'http://localhost:8080/api';
         let allRooms = [];
 
         /* ── ROLE-BASED ACCESS ─────────────────── */
         const ADMIN_ROLES = ['SUPER_ADMIN', 'DIRECTOR_OF_INSTITUTE', 'HEAD_OF_DEPARTMENT', 'DIRECTOR_OF_STUDIES'];
-        const userRole = sessionStorage.getItem('role') || '';
+        const userRole = localStorage.getItem('role') || '';
         const isAdmin = ADMIN_ROLES.includes(userRole);
 
         // Apply role-based UI on page load
@@ -1029,7 +1029,7 @@
 
         /* ── HELPER ─────────────────────────────── */
         const getAuthHeaders = (isJson = false) => {
-            const token = sessionStorage.getItem('jwt');
+            const token = localStorage.getItem('jwt');
             const headers = { 'Authorization': `Bearer ${token}` };
             if (isJson) headers['Content-Type'] = 'application/json';
             return headers;

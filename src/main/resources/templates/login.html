@@ -154,10 +154,10 @@
         });
         const data = await res.json();
         if (!res.ok) { showMsg(data.message || 'Login failed.', 'error'); return; }
-        sessionStorage.setItem('jwt', data.token);
-        sessionStorage.setItem('role', data.role);
-        sessionStorage.setItem('fullName', data.fullName);
-        sessionStorage.setItem('email', data.email);
+        localStorage.setItem('jwt', data.token);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('fullName', data.fullName);
+        localStorage.setItem('email', data.email);
         window.location.href = DASHBOARDS[data.role] || 'index.html';
       } catch (e) { showMsg('Could not connect to server.', 'error'); }
     }

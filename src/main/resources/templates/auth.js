@@ -1,10 +1,10 @@
 // ── auth.js — shared JWT utilities ──────────────────────────────────────────
 const AUTH_API = '';
 
-function getToken()    { return sessionStorage.getItem('jwt'); }
-function getRole()     { return sessionStorage.getItem('role'); }
-function getFullName() { return sessionStorage.getItem('fullName'); }
-function getEmail()    { return sessionStorage.getItem('email'); }
+function getToken()    { return localStorage.getItem('jwt'); }
+function getRole()     { return localStorage.getItem('role'); }
+function getFullName() { return localStorage.getItem('fullName'); }
+function getEmail()    { return localStorage.getItem('email'); }
 
 function requireAuth(allowedRoles) {
   const token = getToken();
@@ -17,7 +17,7 @@ function requireAuth(allowedRoles) {
 }
 
 function logout() {
-  sessionStorage.clear();
+  localStorage.clear();
   window.location.href = 'login.html';
 }
 

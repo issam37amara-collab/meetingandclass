@@ -1097,7 +1097,7 @@
 
     /* ── HELPER ─────────────────────────────── */
     const getAuthHeaders = (isJson = false) => {
-      const token = sessionStorage.getItem('jwt');
+      const token = localStorage.getItem('jwt');
       const headers = { 'Authorization': `Bearer ${token}` };
       if (isJson) headers['Content-Type'] = 'application/json';
       return headers;

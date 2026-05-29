@@ -8,7 +8,7 @@ function fetchMeetings() {
     listContainer.innerHTML = '<p style="text-align:center;">Fetching meetings from database...</p>';
 
     fetch('/api/meetings/all', {
-        headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt') }
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('jwt') }
     })
         .then(response => {
             if (!response.ok) throw new Error("Failed to connect to server");
@@ -106,9 +106,9 @@ function uploadPdf(meetingId) {
     statusDiv.innerText = "Uploading...";
     statusDiv.style.color = "yellow";
 
-    fetch(`http://localhost:8080/api/meetings/${meetingId}/upload-summary`, {
+    fetch(`/api/meetings/${meetingId}/upload-summary`, {
         method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt') },
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('jwt') },
         body: formData
     })
         .then(async response => {
@@ -133,8 +133,8 @@ function uploadPdf(meetingId) {
 //    the browser does not attach the Authorization header to a navigation.
 async function viewPdf(meetingId) {
     try {
-        const res = await fetch(`http://localhost:8080/api/meetings/download/${meetingId}`, {
-            headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt') }
+        const res = await fetch(`/api/meetings/download/${meetingId}`, {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('jwt') }
         });
         if (res.status === 401 || res.status === 403) {
             alert("Your session expired or you are not allowed to view this PDF.");
