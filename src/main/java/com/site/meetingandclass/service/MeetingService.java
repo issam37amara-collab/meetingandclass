@@ -13,6 +13,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +52,9 @@ public class MeetingService {
 
     @Value("${app.mail.admin:admin@cuniv-naama.dz}")
     private String adminEmail;
+
+    @Value("${SENDGRID_API_KEY}")
+    private String sendGridApiKey;
 
     // 1. Create a meeting and email each invited member.
     public Meeting createMeeting(Meeting meeting) {
@@ -150,15 +159,29 @@ public class MeetingService {
         }
     }
 
-    private void sendSimpleEmail(String to, String subject, String body) {
-        log.info("Sending email to {} (from={})...", to, mailFrom);
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+private void sendSimpleEmail(String to, String subject, String body) {
+    try {
+        Email from = new Email(mailFrom);
+        Email toEmail = new Email(to);
+        Content content = new Content("text/plain", body);
+        Mail mail = new Mail(from, subject, toEmail, content);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+        request.setBody(mail.build());
+
+        Response response = sg.api(request);
+        if (response.getStatusCode() >= 400) {
+            log.error("SendGrid error {}: {}", response.getStatusCode(), response.getBody());
+        } else {
+            log.info("Email sent to {} via SendGrid API (status {})", to, response.getStatusCode());
+        }
+    } catch (Exception e) {
+        log.error("Failed to send email to {}: {}", to, e.getMessage());
     }
+}
 
     private void sendEmailWithAttachment(String to, String subject, String body, File file) {
         try {
