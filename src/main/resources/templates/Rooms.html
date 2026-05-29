@@ -768,7 +768,7 @@
 
     <!-- NAV -->
     <nav class="glass-nav" data-aos="fade-down" data-aos-duration="1000">
-        <a href="menu.html" class="logo">ISSAM</a>
+        <a href="menu.html" class="logo">CUNIV<span style="font-weight:300; color:#9d4edd;">NAAMA</span></a>
         <ul>
             <li><a href="#" onclick="goToDashboard();return false;">Dashboard</a></li>
             <li><a href="menu.html">University</a></li>
@@ -786,15 +786,11 @@
                     <a href="admin-reservations.html">Reservations</a>
                 </div>
             </li>
-            <li><a href="#">Resources</a></li>
+
+            <li id="navClassSchedules"><a href="class-timetable.html" style="color:#9d4edd">Class Schedules</a></li>
         </ul>
         <div class="nav-right">
-            <!-- Temporary role switcher — will be replaced by real JWT auth -->
-            <div class="view-toggle">
-                <button class="view-btn active" onclick="setMode('teacher', this)">👨‍🏫 Teacher</button>
-                <button class="view-btn" onclick="setMode('admin',   this)">⚙ Admin</button>
-            </div>
-            <a href="log.html" class="btn-signin">Sign In</a>
+            <button class="btn-signin" onclick="logout()">Logout</button>
         </div>
     </nav>
 
@@ -854,12 +850,12 @@
                     <label>Time Slot</label>
                     <select id="rTimeSlot">
                         <option value="">Select slot</option>
-                        <option>08:00 – 09:30</option>
-                        <option>09:45 – 11:15</option>
+                        <option>08:30 – 10:00</option>
+                        <option>10:00 – 11:30</option>
                         <option>11:30 – 13:00</option>
-                        <option>13:30 – 15:00</option>
-                        <option>15:15 – 16:45</option>
-                        <option>17:00 – 18:30</option>
+                        <option>14:00 – 15:30</option>
+                        <option>15:30 – 17:00</option>
+
                     </select>
                 </div>
             </div>
@@ -1018,22 +1014,31 @@
 
         const API = '/api';
         let allRooms = [];
-        let isAdmin = false;
 
-        /* ── MODE TOGGLE ─────────────────────────── */
-        function setMode(mode, btn) {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            isAdmin = (mode === 'admin');
+        /* ── ROLE-BASED ACCESS ─────────────────── */
+        const ADMIN_ROLES = ['SUPER_ADMIN', 'DIRECTOR_OF_INSTITUTE', 'HEAD_OF_DEPARTMENT', 'DIRECTOR_OF_STUDIES'];
+        const userRole = localStorage.getItem('role') || '';
+        const isAdmin = ADMIN_ROLES.includes(userRole);
+
+        // Apply role-based UI on page load
+        (function initRoleUI() {
             document.getElementById('adminBar').classList.toggle('show', isAdmin);
             document.getElementById('btnAddRoom').style.display = isAdmin ? 'flex' : 'none';
-            renderRooms(allRooms);
-        }
+            document.getElementById('navClassSchedules').style.display = isAdmin ? 'block' : 'none';
+        })();
+
+        /* ── HELPER ─────────────────────────────── */
+        const getAuthHeaders = (isJson = false) => {
+            const token = localStorage.getItem('jwt');
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (isJson) headers['Content-Type'] = 'application/json';
+            return headers;
+        };
 
         /* ── LOAD ─────────────────────────────────── */
         async function loadRooms() {
             try {
-                const res = await fetch(`${API}/rooms/all`);
+                const res = await fetch(`${API}/rooms/all`, { headers: getAuthHeaders() });
                 allRooms = await res.json();
                 renderRooms(allRooms);
             } catch {
@@ -1072,14 +1077,15 @@
             </div>
           </div>
           <div class="card-actions">
-            ${isAdmin ? `
-              <button class="btn-card btn-edit"   onclick="openEditModal(${room.id})">✏ Edit</button>
-              <button class="btn-card btn-delete" onclick="openDeleteModal(${room.id}, '${room.name.replace(/'/g, "\\'")}')">🗑 Delete</button>
-            ` : room.status === 'AVAILABLE' ? `
+            ${room.status === 'AVAILABLE' ? `
               <button class="btn-card btn-reserve-active" onclick="openReserveModal(${room.id}, '${room.name.replace(/'/g, "\\'")}')">Reserve Room</button>
             ` : `
               <button class="btn-card btn-reserve-disabled" disabled>Not Available</button>
             `}
+            ${isAdmin ? `
+              <button class="btn-card btn-edit"   onclick="openEditModal(${room.id})">✏ Edit</button>
+              <button class="btn-card btn-delete" onclick="openDeleteModal(${room.id}, '${room.name.replace(/'/g, "\\'")}')">🗑 Delete</button>
+            ` : ''}
           </div>
         </div>
       `).join('');
@@ -1117,7 +1123,7 @@
                 return showToast('Please fill in all fields.', true);
             try {
                 const res = await fetch(`${API}/reservations/request`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: getAuthHeaders(true),
                     body: JSON.stringify({ roomId: +roomId, teacherName: name, teacherEmail: email, date, timeSlot: slot, reason })
                 });
                 res.ok ? (showToast('✅ Request sent! Waiting for admin approval.'), closeAll(), loadRooms())
@@ -1144,7 +1150,7 @@
                 return showToast('Please fill in all fields.', true);
             try {
                 const res = await fetch(`${API}/rooms/add`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: getAuthHeaders(true),
                     body: JSON.stringify({ name, roomNumber: number, capacity: +capacity, type, location, section })
                 });
                 res.ok ? (showToast('✅ Room added successfully!'), closeAll(), loadRooms())
@@ -1180,7 +1186,7 @@
                 return showToast('Please fill in all fields.', true);
             try {
                 const res = await fetch(`${API}/rooms/update/${id}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    method: 'PUT', headers: getAuthHeaders(true),
                     body: JSON.stringify({ name, roomNumber: number, capacity: +capacity, type, location, section, status })
                 });
                 res.ok ? (showToast('✅ Room updated!'), closeAll(), loadRooms())
@@ -1198,7 +1204,7 @@
         async function submitDelete() {
             const id = document.getElementById('deleteRoomId').value;
             try {
-                const res = await fetch(`${API}/rooms/delete/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API}/rooms/delete/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
                 res.ok ? (showToast('🗑 Room deleted.'), closeAll(), loadRooms())
                     : showToast('❌ ' + await res.text(), true);
             } catch { showToast('❌ Cannot connect to server.', true); }
